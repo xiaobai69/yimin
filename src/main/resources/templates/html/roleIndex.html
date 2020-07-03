@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+	<meta charset="UTF-8">
+	<title>益民药房后台管理</title>
+
+	<link rel="stylesheet" href="../css/pagination.css" />
+	<link rel="stylesheet" href="../assets/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../assets/css/ready.css">
+	<link rel="stylesheet" href="../assets/css/my.css">
+	<link rel="stylesheet" href="../assets/css/demo.css">
+	<script type="text/javascript" src="../js/jquery.min.js"></script>
+	<!--<script type="text/javascript" src="../js/jquery.pagination.js"></script>-->
+
+</head>
+<script type="text/javascript">
+
+    function showAll() {
+        $("#insert").attr("style","display:none;");
+        $("#pagination").attr("style","display:block;");
+        $("#updateInfo").attr("style","display:none;");//隐藏
+    }
+
+    function insert() {
+        $("#insert").attr("style","display:block;");
+        $("#pagination").attr("style","display:none;");
+        $("#updateInfo").attr("style","display:none;");//隐藏
+    }
+
+    function updateByNmae(value) {
+        $("#insert").attr("style","display:none;");
+        $("#pagination").attr("style","display:none;");
+        $("#updateInfo").attr("style","display:block;");//隐藏
+        console.log(value)
+        $("#updatename").val(value)
+        // $("#updatepassword").val(value.rolePassword)
+        // $("#updatephone").val(value.phone)
+
+
+    }
+    /*修改信息*/
+    function updateInfo() {
+        var name = $("#updatename").val();
+        var password = $("#updatepassword").val();
+        var phone = $("#updatephone").val();
+        var perms = $('input[name="updateperms"]:checked').val();
+        if(perms=="admin"){
+            var role ="管理员"
+        }else if(perms=="staff"){
+            var role ="普通员工"
+        }
+
+        var info = {"roleName":name,"rolePassword":password,"phone":phone,"perms":perms,"role":role};
+        console.log(info);
+        $.ajax({
+            type:"post",
+            url:"../role/updateInfo",
+            data:JSON.stringify(info),
+            contentType: 'application/json;charset=UTF-8',
+            dataType:"json",
+            success: function(data){
+
+                if(data.msg=="成功"){
+
+                    location.reload()
+                }else {
+                    alert(data.msg)
+                }
+
+            }
+        });
+    }
+
+    /*删除信息*/
+    function deleteByNmae(roleName){
+        var role = {"roleName":roleName}
+        var r=confirm("您确定要删除?")
+        if (r==true)
+        {
+            $.ajax({
+                type:"post",
+                url:"../role/deleteByName",
+                data:JSON.stringify(role),
+                contentType: 'application/json;charset=UTF-8',
+                dataType:"json",
+                success: function(data){
+                    if(data.msg=="成功"){
+
+                        location.reload()
+                    }else {
+                        alert(data.msg)
+                    }
+                }
+            });
+        }else {
+
+            return;
+        }
+
+
+    }
+
+    /*查询所有信息*/
+    window.onload=function(){
+
+        var str = " "
+        $.ajax({
+            type:"post",
+            url:"../role/selAll",
+            contentType: 'application/json;charset=UTF-8',
+            dataType:"json",
+            success: function(data){
+                for(var i=0;i<data.length;i++){
+
+                    str="<tr>" +
+                        "<td>"+data[i].roleName+"</td>"+
+                        "<td>" +data[i].role+"</td>" +
+                        "<td>" +data[i].phone+"</td>"+
+                        "<td >" +
+                        "<button onclick='deleteByNmae(value)' value='"+data[i].roleName+"'  >删除该员工信息</button>&nbsp;&nbsp;" +
+                        "&nbsp;&nbsp;<button onclick='updateByNmae(value)' value='"+data[i].roleName+"'  >修改该员工信息</button></td>"+
+                        "</tr>";
+
+                    $("#tab").append(str);
+                }
+
+
+                $("#insert").attr("style","display:none;");
+                $("#pagination").attr("style","display:block;");
+                $("#updateInfo").attr("style","display:none;");//隐藏
+
+            }
+        });
+
+        $.ajax({
+            type:"post",
+            url:"../role/getRoleuser",
+            // data:JSON.stringify(info),
+            // contentType: 'application/json;charset=UTF-8',
+            // dataType:"json",
+            success: function(data){
+
+                console.log(data)
+                console.log(data.roleName)
+
+
+                $("#addname").append("当前用户:"+data.roleName+"")
+
+
+
+
+            }
+        });
+    }
+    /*添加信息*/
+    function roleInfo() {
+        var name = $("#rolename").val();
+        var password = $("#rolepassword").val();
+        var phone = $("#phone").val();
+        var perms = $('input[name="perms"]:checked').val();
+        if(perms=="admin"){
+            var role ="管理员"
+        }else if(perms=="staff"){
+            var role ="普通员工"
+        }
+
+        var info = {"roleName":name,"rolePassword":password,"phone":phone,"perms":perms,"role":role};
+        console.log(info);
+        $.ajax({
+            type:"post",
+            url:"../role/roleInsert",
+            data:JSON.stringify(info),
+            contentType: 'application/json;charset=UTF-8',
+            dataType:"json",
+            success: function(data){
+
+                if(data.msg=="成功"){
+
+                    location.reload()
+                }else {
+                    alert(data.msg)
+                }
+
+
+            }
+        });
+
+    }
+</script>
+<body>
+<div class="wrapper">
+
+	<!--头部信息-->
+	<div class="main-header">
+
+			<nav class="navbar navbar-header navbar-expand-lg">
+				<div class="container-fluid">
+
+					<div id="addname"></div>  <a href="../role/logout" methods="post">退出登录</a>
+
+				</div>
+			</nav>
+		</div>
+
+		<!--左侧信息栏-->
+		<div class="sidebar">
+				<div class="scrollbar-inner sidebar-wrapper">
+
+					<ul class="nav">
+						<li class="nav-item active">
+							<a href="roleIndex.html">
+                                <i class="la la-user">
+                                </i>
+                                <p>管理员信息</p>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="notice.html">
+                                <i class="la la-envelope"></i>
+								<p>药店公告管理</p>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="drugInfo.html">
+                                <i class="la la-list-ol"></i>
+								<p>药品信息管理</p>
+							</a>
+						</li>
+						<li class="nav-item ">
+							<a href="record.html">
+                                <i class="la la-server"></i>
+								<p>进出药品管理</p>
+							</a>
+						</li>
+						<li class="nav-item ">
+							<a href="_buy.html">
+								<i class="la la-cart-arrow-down"></i>
+								<p>线下销售管理</p>
+							</a>
+						</li>
+
+					</ul>
+				</div>
+			</div>
+
+		<!--中间主体内容-->
+		<div class="main-panel">
+				<div class="content">
+					<div class="container-fluid">
+						<!--副标题-->
+                        <div class="card-body ">
+						    <button class="page-title" onclick="insert()">添加员工信息</button>
+                            <button class="page-title" onclick="showAll()">查看所有员工</button>
+                        </div>
+						<div class="row" id="insert">
+							<div class="col-md-12">
+								<div class="card">
+
+									<div class="card-body">
+										<div class="form">
+											<div class="form-group from-show-notify row">
+												<div class="col-lg-4 col-md-3 col-sm-12 text-right">
+													<label >账号:</label>
+												</div>
+												<input type="text" class="form-control input-fixed" id="rolename" placeholder="员工账号">
+											</div>
+
+											<div class="form-group from-show-notify row">
+												<div class="col-lg-4 col-md-3 col-sm-12 text-right">
+													<label >密码:</label>
+												</div>
+												<input type="password" class="form-control input-fixed" id="rolepassword" placeholder="员工密码">
+											</div>
+
+                                            <div class="form-group from-show-notify row">
+                                                <div class="col-lg-4 col-md-3 col-sm-12 text-right">
+                                                    <label >电话:</label>
+                                                </div>
+                                                <input type="text" class="form-control input-fixed" id="phone" placeholder="员工电话">
+                                            </div>
+
+											<div class="form-group from-show-notify row" >
+                                                <div class="col-lg-5 col-md-3 col-sm-12 text-right">
+													<label class="form-radio-label">
+														<input type="radio" class="form-radio-input"  name="perms" value="admin">
+														<span class="form-radio-sign" id="admin">
+															    管理员
+														</span>&nbsp;
+													</label>
+													<label class="form-check-label">
+														<input type="radio" class="form-radio-input" name="perms" value="staff" >
+														<span class="form-radio-sign" id="staff">
+															普通员工
+														</span>
+													</label>
+
+												</div>
+											</div>
+											<div class="form-group from-show-notify row">
+												<div class="col-lg-5 col-md-9 col-sm-12 text-right">
+													<button class="btn btn-success" onclick="roleInfo()">提交信息</button>
+												</div>
+											</div>
+										</div>
+									</div>
+
+								</div>
+							</div>
+						</div>
+                        <div class="row" id="pagination">
+                            <table class="table table-bordered table-head-bg-info table-bordered-bd-info mt-4">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">员工账号</th>
+                                        <th scope="col">员工角色</th>
+                                        <th scope="col">员工电话</th>
+                                        <th scope="col">选择操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tab">
+
+                                </tbody>
+                            </table>
+                        </div>
+						<div class="row" id="updateInfo">
+							<div class="col-md-12">
+								<div class="card">
+
+									<div class="card-body">
+										<div class="form">
+											<div class="form-group from-show-notify row">
+												<div class="col-lg-4 col-md-3 col-sm-12 text-right">
+													<label >账号:</label>
+												</div>
+												<input type="text" class="form-control input-fixed" id="updatename" placeholder="员工账号" readonly="readonly">
+											</div>
+
+											<div class="form-group from-show-notify row">
+												<div class="col-lg-4 col-md-3 col-sm-12 text-right">
+													<label >密码:</label>
+												</div>
+												<input type="password" class="form-control input-fixed" id="updatepassword" placeholder="更改密码" >
+											</div>
+
+											<div class="form-group from-show-notify row">
+												<div class="col-lg-4 col-md-3 col-sm-12 text-right">
+													<label >电话:</label>
+												</div>
+												<input type="text" class="form-control input-fixed" id="updatephone" placeholder="更改电话">
+											</div>
+
+											<div class="form-group from-show-notify row" >
+												<div class="col-lg-5 col-md-3 col-sm-12 text-right">
+													<label class="form-radio-label">
+														<input type="radio" class="form-radio-input"  name="updateperms" value="admin">
+														<span class="form-radio-sign" >
+															    管理员
+														</span>&nbsp;
+													</label>
+													<label class="form-check-label">
+														<input type="radio" class="form-radio-input" name="updateperms" value="staff" >
+														<span class="form-radio-sign" >
+															普通员工
+														</span>
+													</label>
+
+												</div>
+											</div>
+											<div class="form-group from-show-notify row">
+												<div class="col-lg-5 col-md-9 col-sm-12 text-right">
+													<button class="btn btn-success" onclick="updateInfo()">确定更改</button>
+												</div>
+											</div>
+										</div>
+									</div>
+
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+			</div>
+
+		</div>
+	</div>
+</body>
+
+</html>

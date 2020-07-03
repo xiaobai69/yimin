@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>益民大药房</title>
+	<link href="../css/bootstrap.css" type="text/css" rel="stylesheet" media="all">
+	<link href="../css/styles.css" type="text/css" rel="stylesheet" media="all">
+	<link rel="stylesheet" href="../assets/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../assets/css/ready.css">
+	<link rel="stylesheet" href="../assets/css/my.css">
+	<link rel="stylesheet" href="../assets/css/demo.css">
+	<script type="text/javascript" src="../js/jquery.min.js"></script>
+</head>
+
+
+<script type="text/javascript">
+
+    <!--获取药店信息公告-->
+    window.onload=function(){
+
+        $.ajax({
+            type:"post",
+            url:"../drug/getUser",
+            // data:JSON.stringify(info),
+            // contentType: 'application/json;charset=UTF-8',
+            // dataType:"json",
+            success: function(data){
+                if(data == ""){
+                    $("#username").append("<a href='login.html' style='color:mintcream'>"+"当前未登录，请跳转登录"+"</a>"+"")
+
+                } else {
+                    $("#username").append("当前用户:"+data.name+"    <a href='../user/outLog' methods='post' style='color:mintcream'>"+"退出登录"+"</a>"+"")
+
+                }
+
+
+
+            }
+        });
+
+        var str = " "
+        $.ajax({
+            type:"post",
+            url:"../news/getAll",
+            contentType: 'application/json;charset=UTF-8',
+            dataType:"json",
+            success: function(data){
+                for(var i=0;i<data.length;i++){
+                    str="<tr>" +
+                        "<td>"+data[i].title+"</td>"+
+                        "<td>" +data[i].contents+"</td>" +
+                        "<td>" +data[i].inputName+"</td>"+
+                        "<td>" +data[i].inputTime+"</td>"+
+                        "</tr>";
+                    $("#tab").append(str);
+                }
+            }
+        });
+    }
+
+
+</script>
+
+
+<body>
+<!--标题头-->
+<div class="header">
+	<div class="container">
+		<div class="header-logo">
+			<div class="header-info">
+				<h4>益民大药房</h4>
+			</div>
+
+
+		</div>
+		<div class="header-info">
+			<div id="username"></div>
+
+		</div>
+		<div class="clearfix"> </div>
+	</div>
+</div>
+
+<!--搜索栏-->
+<div class="header-bottom">
+	<div class="container">
+		<!--top-nav-->
+		<div class="top-nav cl-effect-5">
+			<span class="menu-icon"><img src="../images/menu-icon.png" alt=""/></span>
+			<ul class="nav1">
+				<li><a href="index.html" ><span data-hover="药店简介">药店简介</span></a></li>
+				<li><a href="about.html" > <span data-hover="药品信息查询">药品信息查询</span></a></li>
+				<li><a href="services.html" > <span data-hover="热销、分类、推送">热销、分类、推送</span></a></li>
+				<li><a href="buy.html"> <span data-hover="购物车">购物车</span></a></li>
+				<li><a href="news.html" class="active"> <span data-hover="药店信息公告">药店信息公告</span></a></li>
+			</ul>
+
+		</div>
+
+		<div class="clearfix"> </div>
+	</div>
+</div>
+
+<!--药店信息公告-->
+<div class="contact">
+	<div class="container">
+		<h3>药店信息公告</h3>
+
+							<table class="table table-bordered table-head-bg-info table-bordered-bd-info mt-4">
+								<thead>
+								<tr>
+									<th scope="col">公告标题</th>
+									<th scope="col">公告内容</th>
+									<th scope="col">发布人</th>
+									<th scope="col">发布时间</th>
+
+								</tr>
+								</thead>
+								<tbody id="tab">
+
+								</tbody>
+							</table>
+
+
+	</div>
+</div>
+
+
+<!--底部药店说明-->
+<div class="footer-bottom">
+	<div class="container">
+		<p> 益民大药房网上药店版权所有，并保留所有权利  <a href="index.html">http://localhost:8080/html/index.html</a></p>
+	</div>
+</div>
+
+<!--返回顶部-->
+<a href="#" id="toTop" style="display: block;"> <span id="toTopHover" style="opacity: 1;"> </span></a>
+
+</body>
+</html>

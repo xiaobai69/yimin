@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>益民药房后台管理</title>
+
+    <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../assets/css/ready.css">
+    <link rel="stylesheet" href="../assets/css/my.css">
+    <link rel="stylesheet" href="../assets/css/demo.css">
+    <link rel="stylesheet" href="../css/pagination.css" />
+
+    <script type="text/javascript" src="../js/jquery.min.js"></script>
+</head>
+<script type="text/javascript">
+
+    <!--员工登录验证-->
+    window.onload=function () {
+
+        $.ajax({
+            type:"post",
+            url:"../role/getRoleuser",
+            // data:JSON.stringify(info),
+            // contentType: 'application/json;charset=UTF-8',
+            // dataType:"json",
+            success: function(data){
+                if(data.perms == "staff"){
+                    $("#adminInfo").attr("style","display:none;");//div隐藏
+                }
+                if (data==""){
+                    alert("当前为获取到员工信息，请登录...")
+                    window.open(url="../html/roleLogin.html","_self")
+                }else {
+
+                    $("#addname").append("当前用户:"+data.roleName+"")
+                }
+            }
+        });
+
+        $("#tab1").empty()
+        var str = " "
+        $.ajax({
+            type:"post",
+            url:"../drug/getByNumber",
+            contentType: 'application/json;charset=UTF-8',
+            dataType:"json",
+            success: function(data){
+                for (var i = 0; i < data.length; i++) {
+                    str = "<tr>" +
+                        "<td>" + data[i].drugName + "</td>" +
+                        "<td>" + data[i].number + "</td>" +
+                        "</tr>";
+                    $("#tab").append(str);
+                }
+                $("#sale").attr("style", "display:block;");
+                $("#add").attr("style", "display:none;");//隐藏
+                $("#add2").attr("style", "display:none;");//隐藏
+            }
+        });
+    }
+
+    /*销售记录显示*/
+    function sale() {
+        location.reload()
+    }
+
+    /*显示进货记录*/
+    function add() {
+        $("#tab1").empty()
+        var str = " "
+        $.ajax({
+            type:"post",
+            url:"../drug/getByNumber",
+            contentType: 'application/json;charset=UTF-8',
+            dataType:"json",
+            success: function(data){
+                for (var i = 0; i < data.length; i++) {
+                    str = "<tr>" +
+                        "<td>" + data[i].drugName + "</td>" +
+                        "<td>" + data[i].count + "</td>" +
+                        "<td>" + data[i].nowCount + "</td>" +
+                        "</tr>";
+
+                    $("#tab1").append(str);
+                }
+                $("#add").attr("style", "display:block;");
+                $("#sale").attr("style", "display:none;");
+                $("#add2").attr("style", "display:none;");
+            }
+        });
+    }
+    function  buy() {
+        $("#add").attr("style", "display:none;");
+        $("#sale").attr("style", "display:none;");
+        $("#add2").attr("style", "display:block;");
+        $("#tab2").empty();
+        var str = " "
+        $.ajax({
+            type:"post",
+            url:"../buy/selAllUp",
+            contentType: 'application/json;charset=UTF-8',
+            dataType:"json",
+            success: function(data){
+                for (var i = 0; i < data.length; i++) {
+
+                    str = "<tr>" +
+                        "<td>" + data[i].name + "</td>" +
+                        "<td>" + data[i].phone + "</td>" +
+                        "<td>" + data[i].address + "</td>" +
+                        "<td>" + data[i].drugname + "</td>" +
+                        "<td>" + data[i].number + "</td>" +
+                        "<td>" + data[i].salemoney + "</td>" +
+                        "<td><button onclick='fahuo(value)' value="+data[i].bid+" >已发货</button></td>" +
+                        "</tr>";
+                    $("#tab2").append(str);
+                }
+
+            }
+        });
+
+    }
+    /*确认发货*/
+    function fahuo(value) {
+        console.log(value)
+        $.ajax({
+            type:"post",
+            url:"../buy/buyUp",
+            data:"id="+value,
+
+            success: function(data){
+                alert(data.msg)
+                buy()
+            }
+        });
+    }
+</script>
+<body>
+<div class="wrapper">
+    <!--头部信息-->
+    <div class="main-header">
+
+        <nav class="navbar navbar-header navbar-expand-lg">
+            <div class="container-fluid">
+
+                <div id="addname"></div>  <a href="../role/logout" methods="post">退出登录</a>
+
+            </div>
+        </nav>
+    </div>
+    <!--左侧信息栏-->
+    <div class="sidebar">
+        <div class="scrollbar-inner sidebar-wrapper">
+
+            <ul class="nav">
+                <li class="nav-item " id="adminInfo">
+                    <a href="roleIndex.html">
+                        <i class="la la-user" >
+                        </i>
+                        <p>管理员信息</p>
+                    </a>
+                </li>
+                <li class="nav-item ">
+                    <a href="notice.html">
+                        <i class="la la-envelope"></i>
+                        <p>药店公告管理</p>
+                    </a>
+                </li>
+                <li class="nav-item ">
+                    <a href="drugInfo.html">
+                        <i class="la la-list-ol"></i>
+                        <p>药品信息管理</p>
+                    </a>
+                </li>
+                <li class="nav-item active">
+                    <a href="record.html">
+                        <i class="la la-server"></i>
+                        <p>进出药品管理</p>
+                    </a>
+                </li>
+                <li class="nav-item ">
+                    <a href="_buy.html">
+                        <i class="la la-cart-arrow-down"></i>
+                        <p>线下销售管理</p>
+                    </a>
+                </li>
+
+            </ul>
+        </div>
+    </div>
+    <!--中间主体内容-->
+    <div class="main-panel">
+        <div class="content">
+            <div class="container-fluid">
+                <button onclick="sale()">销售记录</button>&nbsp;&nbsp;
+                <button onclick="add()">进货记录</button>&nbsp;&nbsp;
+                <button onclick="buy()">订单发货</button>
+                <div class="row" id="sale">
+                    <table class="table table-bordered table-head-bg-info table-bordered-bd-info mt-4">
+                        <thead>
+                        <tr>
+                            <th scope="col">药品名称</th>
+                            <th scope="col">药品销量</th>
+                        </tr>
+                        </thead>
+
+                        <tbody id="tab" class="Pagination">
+
+                        </tbody>
+
+                    </table>
+                </div>
+
+                <div class="row" id="add">
+                    <table class="table table-bordered table-head-bg-info table-bordered-bd-info mt-4">
+                        <thead>
+                        <tr>
+                            <th scope="col">药品名称</th>
+                            <th scope="col">入库数量</th>
+                            <th scope="col">当前库存数量</th>
+                        </tr>
+                        </thead>
+
+                        <tbody id="tab1" class="Pagination">
+
+                        </tbody>
+
+                    </table>
+                </div>
+                <div class="row" id="add2">
+                    <table class="table table-bordered table-head-bg-info table-bordered-bd-info mt-4">
+                        <thead>
+                        <tr>
+                            <th scope="col">用户名</th>
+                            <th scope="col">电话</th>
+                            <th scope="col">地址</th>
+                            <th scope="col">药品名称</th>
+                            <th scope="col">药品数量</th>
+                            <th scope="col">药品价格</th>
+                            <th scope="col">操作选择</th>
+
+                        </tr>
+                        </thead>
+
+                        <tbody id="tab2" >
+
+                        </tbody>
+
+                    </table>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+</div>
+</body>
+
+</html>

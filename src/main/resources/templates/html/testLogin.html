@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>益民药房后台登录</title>
+    <link rel="stylesheet" type="text/css" href="../css/index.css" />
+    <script type="text/javascript" src="../js/jquery.min.js"></script>
+</head>
+<script type="text/javascript">
+
+    function login() {
+        var name = $("#name").val();
+        var password = $("#password").val();
+        var info = {"roleName":name,"rolePassword":password}
+
+        $.ajax({
+
+            type:"post",
+            url:"../role/roleLogin",
+            data:JSON.stringify(info),
+            contentType: 'application/json;charset=UTF-8',
+            dataType:"json",
+            success: function(data){
+                if(data.msg == "登录成功"){
+
+                    location.href="testIndex.html"
+
+                }else{
+                    alert(data.msg)
+
+                }
+            }
+
+        })
+    }
+
+</script>
+<body>
+
+<img class="bgone" src="../img/roleLogin_1.jpg" />
+<img class="pic" src="../img/roleLogin_a.png" />
+
+<div class="table">
+    <div class="wel">益民药房后台登录</div>
+    <div class="wel1">YI MIN YAO FANG HUO TAI DENG LU</div>
+    <div class="user">
+        <div id="yonghu" style=""><img src="../img/roleLogin_yhm.png" /></div>
+        <input type="text"  placeholder="用户名" id="name"/>
+    </div>
+    <div class="password">
+        <div id="yonghu"><img src="../img/roleLogin_mm.png" /></div>
+        <input type="password"  placeholder="密码" id="password"/>
+    </div>
+    <input class="btn" type="button" name="登录" value="登录" onclick="login()"/>
+</div>
+
+</body>
+</html>

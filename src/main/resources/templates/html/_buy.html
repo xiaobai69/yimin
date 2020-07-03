@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>益民药房后台管理</title>
+
+    <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../assets/css/ready.css">
+    <link rel="stylesheet" href="../assets/css/my.css">
+    <link rel="stylesheet" href="../assets/css/demo.css">
+    <link rel="stylesheet" href="../css/pagination.css" />
+
+    <script type="text/javascript" src="../js/jquery.min.js"></script>
+</head>
+<script type="text/javascript">
+    /*员工进行线下销售管理，使用一个药店注册的用户id*/
+    var uid = 25;
+    <!--员工登录验证-->
+    window.onload=function () {
+
+        $.ajax({
+            type:"post",
+            url:"../role/getRoleuser",
+            // data:JSON.stringify(info),
+            // contentType: 'application/json;charset=UTF-8',
+            // dataType:"json",
+            success: function(data){
+                if(data.perms == "staff"){
+                    $("#adminInfo").attr("style","display:none;");//div隐藏
+                }
+                if (data==""){
+                    alert("当前为获取到员工信息，请登录...")
+                    window.open(url="../html/roleLogin.html","_self")
+                }else {
+
+                    $("#addname").append("当前用户:"+data.roleName+"")
+                }
+            }
+        });
+
+
+        var str = " "
+        $.ajax({
+
+            type:"post",
+            url:"../buy/underSelAll",
+            data:"uid="+uid,
+            success: function(data){
+                for(var i=0;i<data.length;i++){
+                    var sum =(data[i].number)*(data[i].salemoney)
+                    str="<tr>" +
+                        "<td>"+data[i].drugname+"</td>"+
+                        "<td>" +data[i].salemoney+"</td>" +
+                        "<td>" +data[i].number+"</td>"+
+                        "<td>" +sum+"</td>"+
+                        "<td><button onclick='buy(value)' value="+data[i].drugname+">确认购买</button>&nbsp;&nbsp;"+
+                        "&nbsp;&nbsp;<button onclick='deleteInfo(value)' value="+data[i].drugname+">删除药品</button></td>"+
+                        "</tr>";
+
+                    $("#tab").append(str);
+                }
+            }
+        });
+
+        $("#selInfo").attr("style","display:none;");//隐藏
+        $("#buyInfo").attr("style","display:block;");//显示
+    }
+
+    /*购物车信息按钮，显示购物车信息*/
+    function showAll() {
+        $("#tab").empty();
+        location.reload()
+    }
+
+    /*确定购买药品*/
+    function buy(value) {
+        console.log(value)
+        $.ajax({
+            type:"post",
+            url:"../buy/underBuy",
+            data:{"drugName":value ,"uid":uid},
+            success: function(data){
+                if(data.msg == "购买成功"){
+                    alert(data.msg)
+                    location.reload()
+
+                } else {
+                    alert(data.msg)
+
+                }
+            }
+        });
+    }
+
+    <!--删除购物车信息-->
+    function deleteInfo(value){
+        console.log(value)
+        var r=confirm("您确定要删除?")
+        if (r==true) {
+            $.ajax({
+                type: "post",
+                url: "../buy/deleteInfo",
+                data: "drugName=" + value,
+                success: function (data) {
+                    if (data.msg == "删除成功") {
+                        location.reload()
+
+                    } else {
+                        alert(data.msg)
+
+                    }
+                }
+            });
+        }
+    }
+
+    /*显示搜索信息*/
+    function selInfo() {
+        var info = $("#info").val()
+        var str = " "
+        $.ajax({
+            type:"post",
+            url:"../drug/getByInfo",
+            data:"info="+info,
+            success: function(data){
+                /*查询前清空上次查询信息*/
+                $("#selTab").empty();
+                for(var i=0;i<data.length;i++){
+
+                    str="<tr>" +
+                        "<td>"+data[i].drugName+"</td>"+
+                        "<td>" +data[i].type+"</td>" +
+                        "<td>" +data[i].mainFunction+"</td>" +
+                        "<td>" +data[i].nowCount+"</td>" +
+                        "<td>" +data[i].madeTime+"</td>" +
+                        "<td>" +data[i].totalTime+"</td>" +
+                        "<td>" +data[i].saleMoney+"</td>" +
+                        "<td>" +data[i].note+"</td>" +
+                        "<td><input  value='1' style='width: 50px' id="+data[i].id+"info"+"></td>"+
+                        "<td><button onclick='buyInfo(this.value)' value="+data[i].id+">添加购物车</button></td>" +
+                        "</tr>";
+
+                    $("#selTab").append(str);
+                }
+                $("#selInfo").attr("style","display:block;");//显示
+                $("#buyInfo").attr("style","display:none;");//隐藏
+            }
+
+        });
+    }
+
+    <!--添加购物车	-->
+    function buyInfo(value) {
+        // 获取到药品id
+        var number = $("#"+value+"info").val()
+        console.log(number)
+        var info ={"did":value,"uid":uid,"number":number}
+        $.ajax({
+            type:"post",
+            url:"../buy/insertInfo",
+            data:JSON.stringify(info),
+            contentType: 'application/json;charset=UTF-8',
+            dataType:"json",
+            success: function(data){
+                alert(data.msg)
+            }
+        });
+    }
+
+</script>
+<body>
+<div class="wrapper">
+    <!--头部信息-->
+    <div class="main-header">
+
+        <nav class="navbar navbar-header navbar-expand-lg">
+            <div class="container-fluid">
+
+                <div id="addname"></div>  <a href="../role/logout" methods="post">退出登录</a>
+
+            </div>
+        </nav>
+    </div>
+    <!--左侧信息栏-->
+    <div class="sidebar">
+        <div class="scrollbar-inner sidebar-wrapper">
+
+            <ul class="nav">
+                <li class="nav-item " id="adminInfo">
+                    <a href="roleIndex.html">
+                        <i class="la la-user" >
+                        </i>
+                        <p>管理员信息</p>
+                    </a>
+                </li>
+                <li class="nav-item ">
+                    <a href="notice.html">
+                        <i class="la la-envelope"></i>
+                        <p>药店公告管理</p>
+                    </a>
+                </li>
+                <li class="nav-item ">
+                    <a href="drugInfo.html">
+                        <i class="la la-list-ol"></i>
+                        <p>药品信息管理</p>
+                    </a>
+                </li>
+                <li class="nav-item ">
+                    <a href="record.html">
+                        <i class="la la-server"></i>
+                        <p>进出药品管理</p>
+                    </a>
+                </li>
+                <li class="nav-item active">
+                    <a href="_buy.html">
+                        <i class="la la-cart-arrow-down"></i>
+                        <p>线下销售管理</p>
+                    </a>
+                </li>
+
+            </ul>
+        </div>
+    </div>
+    <!--中间主体内容-->
+    <div class="main-panel">
+        <div class="content">
+            <div class="container-fluid">
+                <button onclick="showAll()">预购中心</button>&nbsp;&nbsp;&nbsp;
+                <input id="info" placeholder="搜索">&nbsp;<button onclick="selInfo()" >查询</button>
+                <!--购物车信息-->
+                <div class="row" id="buyInfo">
+                    <table class="table table-bordered table-head-bg-info table-bordered-bd-info mt-4">
+                        <thead>
+                        <tr>
+                            <th scope="col">药品名称</th>
+                            <th scope="col">药品价格</th>
+                            <th scope="col">药品数量</th>
+                            <th scope="col">总价</th>
+                            <th scope="col">操作选择</th>
+                        </tr>
+                        </thead>
+                        <tbody id="tab" >
+
+                        </tbody>
+
+                    </table>
+                </div>
+
+                <!--显示搜索信息-->
+                <div class="row" id="selInfo">
+                    <table class="table table-bordered table-head-bg-info table-bordered-bd-info mt-4">
+                        <thead>
+                        <tr>
+                            <th scope="col">药品名称</th>
+                            <th scope="col">药品类型</th>
+                            <th scope="col">药品主治功能</th>
+                            <th scope="col">药品现有库存</th>
+                            <th scope="col">药品生产日期</th>
+                            <th scope="col">药品保质期</th>
+                            <th scope="col">药品售价</th>
+                            <th scope="col">备注信息</th>
+                            <th scope="col">购买数量</th>
+                            <th scope="col">选择操作</th>
+
+                        </tr>
+                        </thead>
+                        <tbody id="selTab">
+
+                        </tbody>
+                    </table>
+                </div>
+
+
+            </div>
+        </div>
+
+    </div>
+</div>
+</div>
+</body>
+
+</html>

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <meta charset="UTF-8">
+    <title>益民药房后台管理</title>
+
+    <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../assets/css/ready.css">
+    <link rel="stylesheet" href="../assets/css/my.css">
+    <link rel="stylesheet" href="../assets/css/demo.css">
+    <script type="text/javascript" src="../js/jquery.min.js"></script>
+</head>
+<script type="text/javascript">
+
+    <!--员工登录验证-->
+    window.onload=function () {
+
+        $.ajax({
+            type:"post",
+            url:"../role/getRoleuser",
+            // data:JSON.stringify(info),
+            // contentType: 'application/json;charset=UTF-8',
+            // dataType:"json",
+            success: function(data){
+                if(data.perms == "staff"){
+                    $("#adminInfo").attr("style","display:none;");//div隐藏
+                }
+                if (data==""){
+                    alert("当前为获取到员工信息，请登录...")
+                    window.open(url="../html/roleLogin.html","_self")
+                }else {
+
+                    $("#addname").append("当前用户:"+data.roleName+"")
+
+                    $("#insert").attr("style","display:block;");//div显示
+                    $("#showAll").attr("style","display:none;");//div隐藏
+                }
+            }
+        });
+    }
+
+    <!--发布公告-->
+    function insertInfo() {
+
+        $("#insert").attr("style","display:block;");//div显示
+        $("#showAll").attr("style","display:none;");//div隐藏
+
+        var hear = $("#hear").val()
+        var contents = $("#contents").val()
+        var info = {"title":hear,"contents":contents}
+
+        $.ajax({
+                type:"post",
+                url:"../news/insertInfo",
+                data:JSON.stringify(info),
+                contentType: 'application/json;charset=UTF-8',
+                dataType:"json",
+                success: function(data){
+                    if (data.msg=="公告发布成功") {
+                        $("#hear").val('');
+                        $("#contents").val('');
+                        alert(data.msg)
+                    }else {
+                        alert(data.msg)
+                    }
+
+                }
+        })
+    }
+
+    <!--查看所有公告信息-->
+    function showAll() {
+
+        $("#tab").empty();
+        var str = " "
+        $.ajax({
+            type:"post",
+            url:"../news/getAll",
+            contentType: 'application/json;charset=UTF-8',
+            dataType:"json",
+            success: function(data){
+                for(var i=0;i<data.length;i++){
+
+                    str="<tr>" +
+                        "<td>"+data[i].title+"</td>"+
+                        "<td>" +data[i].contents+"</td>" +
+                        "<td>" +data[i].inputName+"</td>"+
+                        "<td>" +data[i].inputTime+"</td>"+
+                        "<td >" +
+                        "<button onclick='deleteByNmae(value)' value='"+data[i].id+"'  >删除公告</button>" +
+                        "</td>"+
+                        "</tr>";
+
+                    $("#tab").append(str);
+                }
+
+                $("#insert").attr("style","display:none;");//div隐藏
+                $("#showAll").attr("style","display:block;");//div显示
+            }
+        });
+    }
+
+    <!--删除公告信息-->
+    function deleteByNmae(value) {
+        var r=confirm("您确定要删除?")
+        if (r==true){
+
+            $.ajax({
+
+                url:"../news/deleteById",
+                data:"id="+value,
+                success:function (data) {
+                    if (data.msg=="删除成功") {
+                        showAll()
+                    }else {
+                        alert(data.msg)
+                    }
+                }
+            })
+        }
+    }
+
+    <!--返回到发布页面-->
+    function insert() {
+        $("#insert").attr("style","display:block;");//div显示
+        $("#showAll").attr("style","display:none;");//div隐藏
+    }
+</script>
+<body>
+<div class="wrapper">
+    <!--头部信息-->
+    <div class="main-header">
+
+        <nav class="navbar navbar-header navbar-expand-lg">
+            <div class="container-fluid">
+
+                <div id="addname"></div>  <a href="../role/logout" methods="post">退出登录</a>
+
+            </div>
+        </nav>
+    </div>
+
+    <!--左侧信息栏-->
+    <div class="sidebar">
+        <div class="scrollbar-inner sidebar-wrapper">
+
+            <ul class="nav">
+                <li class="nav-item " id="adminInfo">
+                    <a href="roleIndex.html">
+                        <i class="la la-user">
+                        </i>
+                        <p >管理员信息</p>
+                    </a>
+                </li>
+                <li class="nav-item active">
+                    <a href="notice.html">
+                        <i class="la la-envelope"></i>
+                        <p>药店公告管理</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="drugInfo.html">
+                        <i class="la la-list-ol"></i>
+                        <p>药品信息管理</p>
+                    </a>
+                </li>
+                <li class="nav-item ">
+                    <a href="record.html">
+                        <i class="la la-server"></i>
+                        <p>进出药品管理</p>
+                    </a>
+                </li>
+                <li class="nav-item ">
+                    <a href="_buy.html">
+                        <i class="la la-cart-arrow-down"></i>
+                        <p>线下销售管理</p>
+                    </a>
+                </li>
+
+            </ul>
+        </div>
+    </div>
+
+    <!--中间主体内容-->
+    <div class="main-panel">
+        <div class="content">
+            <div class="container-fluid">
+                <div class="card-body ">
+                    <button class="page-title" onclick="insert()">发布公告信息</button>
+                    <button class="page-title" onclick="showAll()">查看所有公告</button>
+                </div>
+
+                    <div class="row" id="insert">
+                        <div class="col-lg-7 col-md-3 col-sm-12">
+                            标题：<textarea id="hear" cols="120px" rows="2px"  style="resize:none"  required></textarea>
+
+                            正文：<textarea  id="contents" cols="120px" rows="20px"  style="resize:none"  required></textarea>
+
+                            <button class="page-title" onclick="insertInfo()">确定发布信息</button>
+                        </div>
+                    </div>
+                    <div class="row" id="showAll">
+                    <div class="col-lg-7 col-md-3 col-sm-12" id="showAll1">
+                        <table class="table table-head-bg-success">
+                            <thead>
+                            <tr>
+                                <th scope="col">公告标题</th>
+                                <th scope="col">公告内容</th>
+                                <th scope="col">发布人</th>
+                                <th scope="col">发布时间</th>
+                                <th scope="col">选择操作</th>
+                            </tr>
+                            </thead>
+                            <tbody id="tab">
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+</div>
+</body>
+
+</html>

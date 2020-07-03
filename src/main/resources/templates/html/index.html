@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>益民大药房</title>
+<link href="../css/bootstrap.css" type="text/css" rel="stylesheet" media="all">
+<link href="../css/styles.css" type="text/css" rel="stylesheet" media="all">
+<script type="text/javascript" src="../js/jquery.min.js"></script>
+</head>
+
+<!--用户登录信息-->
+<script type="text/javascript">
+    window.onload=function(){
+        $.ajax({
+            type:"post",
+            url:"../drug/getUser",
+            // data:JSON.stringify(info),
+            // contentType: 'application/json;charset=UTF-8',
+            // dataType:"json",
+            success: function(data){
+				if(data == ""){
+                    $("#username").append("<a href='login.html' style='color:mintcream'>"+"当前未登录，请跳转登录"+"</a>"+"")
+
+                } else {
+				    console.log(data)
+				    console.log(data.name)
+
+                    $("#username").append("当前用户:"+data.name+"    <a href='../user/outLog' methods='post' style='color:mintcream'>"+"退出登录"+"</a>"+"")
+
+
+                }
+
+            }
+        });
+	}
+</script>
+<body>
+	<!--标题头-->
+	<div class="header">
+		<div class="container">
+			<div class="header-logo">
+				<div class="header-info">
+				<h4>益民大药房</h4>
+			</div>
+
+
+		</div>
+			<div class="header-info">
+				<div id="username"></div>
+
+			</div>			
+			<div class="clearfix"> </div>
+		</div>	
+	</div>
+	<!--搜索栏-->
+	<div class="header-bottom">
+		<div class="container">
+			<!--top-nav-->
+			<div class="top-nav cl-effect-5">
+				<span class="menu-icon"><img src="../images/menu-icon.png" alt=""/></span>		
+				<ul class="nav1">
+					<li><a href="index.html" class="active"><span data-hover="药店简介">药店简介</span></a></li>
+					<li><a href="about.html"> <span data-hover="药品信息查询">药品信息查询</span></a></li>
+					<li><a href="services.html"> <span data-hover="热销、分类、推送">热销、分类、推送</span></a></li>
+					<li><a href="buy.html"> <span data-hover="购物车">购物车</span></a></li>
+					<li><a href="news.html"> <span data-hover="药店信息公告">药店信息公告</span></a></li>
+				</ul>
+
+			</div>
+			<!--//top-nav-->
+			<!--<form class="navbar-form navbar-right">-->
+				<!--<div class="form-group">-->
+					<!--<input type="text" class="form-control" placeholder="搜索">-->
+					<!--<button type="submit" class="btn btn-default"></button>-->
+				<!--</div>		-->
+			<!--</form>-->
+			<div class="clearfix"> </div>
+		</div>
+	</div>
+
+	<!--主体1-->
+	<div class="banner">
+		<div class="container ">
+			<!-- banner-text Slider starts Here -->
+			<script src="../js/responsiveslides.min.js"></script>
+			 <script>
+				// You can also use "$(window).load(function() {"
+					$(function () {
+					// Slideshow 4
+						$("#slider3").responsiveSlides({
+						auto: true,
+						pager:true,
+						nav:false,
+						speed: 500,
+						namespace: "callbacks",
+						before: function () {
+						$('.events').append("<li>before event fired.</li>");
+						},
+						after: function () {
+							$('.events').append("<li>after event fired.</li>");
+						}
+					});
+				});
+			</script>
+			<!--//End-slider-script -->
+			<div  id="top" class="callbacks_container">
+				<ul class="rslides" id="slider3">
+					<li>
+						<div class="banner-text">		
+							<h1>关爱生命，呵护健康</h1>
+							<p>Care for life and health</p>
+						</div>
+					</li>
+					<li>
+						<div class="banner-text">		
+							<h1>诚信待人，服务至上</h1>
+							<p>Treat people with integrity and service first</p>
+						</div>
+					</li>
+					<li>
+						<div class="banner-text">		
+							<h1>仁心济世，仙方救人</h1>
+							<p>Benevolence helps the world</p>
+						</div>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+
+	<!--过度-->
+	<div class="banner-bottom">
+		<div class="container">
+			<h2>服务优，益民大药房的工作人员都是经过正规培训过的专业人员，不但对药理、用量及药品选择上都有着丰富的经验，可以保证患者合理用药、对症用药</h2>
+			<a href="#gallery" class="arrow scroll"> </a>
+		</div>
+	</div>
+
+	<!--主体2-->
+	<div class="gallery" id="gallery">
+		<div class="col-md-6 gallery-left">
+			<h4>专业的员工团队</h4>
+			<p>品质保证，专业服务 礼貌待客，顾客满意 规范管理，诚信互利 虚心受教，不断进步</p>
+		</div>
+		<div class="col-md-6 gallery-right">
+			<div class="gallery-grid-a">
+				<h4>精准的用药建议</h4>
+				<p>最大限度地满足客人的需求;最快速度地实现夜场的发展</p>
+			</div>	
+			<div class="gallery-grid-b">		
+				<h4>进口上等药品</h4>
+			<p>以我的真心；耐心；细心，换你的放心；安心；舒心，宁可架上药生尘，但愿世人无疾病</p>
+			</div>
+		</div>
+		<div class="clearfix"> </div>
+	</div>
+
+	<!--底部药店说明-->
+	<div class="footer-bottom">
+		<div class="container">
+			<p> 益民大药房网上药店版权所有，并保留所有权利  <a href="#">http://localhost:8080/html/index.html</a></p>
+		</div>
+	</div>
+
+	<!--返回顶部-->
+	<a href="#" id="toTop" style="display: block;"> <span id="toTopHover" style="opacity: 1;"> </span></a>
+
+</body>
+</html>

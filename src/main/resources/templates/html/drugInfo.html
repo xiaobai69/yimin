@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>益民药房后台管理</title>
+    <link rel="stylesheet" href="../css/pagination.css" />
+    <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../assets/css/ready.css">
+    <link rel="stylesheet" href="../assets/css/my.css">
+    <link rel="stylesheet" href="../assets/css/demo.css">
+
+    <script type="text/javascript" src="../js/jquery.min.js"></script>
+</head>
+<script type="text/javascript">
+
+    /*登录验证，获取所有信息*/
+    window.onload=function () {
+
+        $("#outTime").attr("style","display:none;");//隐藏
+        $("#insert").attr("style","display:none;");//隐藏
+        $("#selInfo").attr("style","display:none;");//隐藏
+        $("#update").attr("style","display:none;");//隐藏
+        $("#showAll").attr("style","display:block;");//显示
+
+
+        $.ajax({
+            type:"post",
+            url:"../role/getRoleuser",
+            // data:JSON.stringify(info),
+            // contentType: 'application/json;charset=UTF-8',
+            // dataType:"json",
+            success: function(data){
+                if(data.perms == "staff"){
+                    $("#adminInfo").attr("style","display:none;");//div隐藏
+                }
+                if (data==""){
+                    alert("当前为获取到员工信息，请登录...")
+                    window.open(url="../html/roleLogin.html","_self")
+                }else {
+
+                    $("#addname").append("当前用户:"+data.roleName+"")
+                }
+            }
+        });
+
+        var str = " "
+        $.ajax({
+            type:"post",
+            url:"../drug/getByNumber",
+            contentType: 'application/json;charset=UTF-8',
+            dataType:"json",
+            success: function(data){
+                $("#tabOuttime").empty();
+                $("#selTab").empty();
+                for(var i=0;i<data.length;i++){
+
+                    str="<tr>" +
+                        "<td>"+data[i].drugName+"</td>"+
+                        "<td>" +data[i].type+"</td>" +
+                        "<td>" +data[i].mainFunction+"</td>" +
+                        "<td>" +data[i].count+"</td>" +
+                        "<td>" +data[i].nowCount+"</td>" +
+                        "<td>" +data[i].madeTime+"</td>" +
+                        "<td>" +data[i].totalTime+"</td>" +
+                        "<td>" +data[i].joinMoney+"</td>" +
+                        "<td>" +data[i].saleMoney+"</td>" +
+                        "<td>" +data[i].number+"</td>"+
+                        "<td>" +data[i].note+"</td>" +
+                        "<td><input  placeholder='添加数量'style='width: 100px' id="+data[i].id+"count"+">&nbsp;" +
+                        "<button onclick='addCount(this.value)' value="+data[i].id+">添加</button><br>" +
+                        "<button onclick='updateInfo(this.value)' value="+data[i].drugName+">修改</button>&nbsp;" +
+                        "<button onclick='deleteInfo(this.value)' value="+data[i].drugName+">删除</button>" +
+                        "</td>" +
+                        "</tr>";
+
+                    $("#tab").append(str);
+
+
+
+                }
+
+
+
+            }
+        });
+    }
+
+    /*显示所有药品信息*/
+    function showAll() {
+        location.reload()
+    }
+
+    /*显示添加信息框*/
+    function addInfo() {
+        $("#outTime").attr("style","display:none;");//隐藏
+        $("#showAll").attr("style","display:none;");
+        $("#update").attr("style","display:none;");
+        $("#selInfo").attr("style","display:none;");
+        $("#insert").attr("style","display:block;");
+    }
+
+    /*显示即将过期药品*/
+    function timeOut() {
+        var str = " "
+        $.ajax({
+            type:"post",
+            url:"../drug/selOuttime",
+            contentType: 'application/json;charset=UTF-8',
+            dataType:"json",
+            success: function(data){
+                $("#tabOuttime").empty();
+                $("#tab").empty();
+                $("#selTab").empty();
+                for(var i=0;i<data.length;i++){
+
+                    str="<tr>" +
+                        "<td>"+data[i].drugName+"</td>"+
+                        "<td>" +data[i].type+"</td>" +
+                        "<td>" +data[i].mainFunction+"</td>" +
+                        "<td>" +data[i].count+"</td>" +
+                        "<td>" +data[i].nowCount+"</td>" +
+                        "<td>" +data[i].madeTime+"</td>" +
+                        "<td>" +data[i].totalTime+"</td>" +
+                        "<td>" +data[i].joinMoney+"</td>" +
+                        "<td>" +data[i].saleMoney+"</td>" +
+                        "<td>" +data[i].number+"</td>"+
+                        "<td>" +data[i].note+"</td>" +
+                        "<td><input  placeholder='添加数量'style='width: 100px' id="+data[i].id+"count"+">&nbsp;" +
+                        "<button onclick='addCount(this.value)' value="+data[i].id+">添加</button><br>" +
+                        "<button onclick='updateInfo(this.value)' value="+data[i].drugName+">修改</button>&nbsp;" +
+                        "<button onclick='deleteInfo(this.value)' value="+data[i].drugName+">删除</button>" +
+                        "</td>" +
+                        "</tr>";
+
+                    $("#tabOuttime").append(str);
+
+
+
+
+                }
+
+
+                $("#showAll").attr("style","display:none;");//隐藏
+                $("#insert").attr("style","display:none;");//隐藏
+                $("#selInfo").attr("style","display:none;");//隐藏
+                $("#update").attr("style","display:none;");//隐藏
+                $("#outTime").attr("style","display:block;");//显示
+
+            }
+        });
+    }
+
+    /*显示搜索信息*/
+    function selInfo() {
+        var info = $("#info").val()
+        var str = " "
+        $.ajax({
+            type:"post",
+            url:"../drug/getByInfo",
+            data:"info="+info,
+            success: function(data){
+                /*查询前清空上次查询信息*/
+                $("#selTab").empty();
+                $("#tab").empty();
+                $("#tabOuttime").empty();
+                for(var i=0;i<data.length;i++){
+
+                    str="<tr>" +
+                        "<td>"+data[i].drugName+"</td>"+
+                        "<td>" +data[i].type+"</td>" +
+                        "<td>" +data[i].mainFunction+"</td>" +
+                        "<td>" +data[i].count+"</td>" +
+                        "<td>" +data[i].nowCount+"</td>" +
+                        "<td>" +data[i].madeTime+"</td>" +
+                        "<td>" +data[i].totalTime+"</td>" +
+                        "<td>" +data[i].joinMoney+"</td>" +
+                        "<td>" +data[i].saleMoney+"</td>" +
+                        "<td>" +data[i].number+"</td>"+
+                        "<td>" +data[i].note+"</td>" +
+                        "<td><input  placeholder='添加数量'style='width: 100px' id="+data[i].id+"count"+">&nbsp;" +
+                        "<button onclick='addCount(this.value)' value="+data[i].id+">添加</button><br>" +
+                        "<button onclick='updateInfo(this.value)' value="+data[i].drugName+">修改</button>&nbsp;" +
+                        "<button onclick='deleteInfo(this.value)' value="+data[i].drugName+">删除</button>" +
+                        "</td>" +
+                        "</tr>";
+
+                    $("#selTab").append(str);
+                }
+
+
+                $("#showAll").attr("style","display:none;");//隐藏
+                $("#insert").attr("style","display:none;");//隐藏
+                $("#outTime").attr("style","display:none;");
+                $("#update").attr("style","display:none;");
+                $("#selInfo").attr("style","display:block;");//显示
+
+            }
+        });
+    }
+
+    /*添加药品数量*/
+    function addCount(value) {
+        var count = $("#"+value+"count").val()
+        $.ajax({
+
+            type:"post",
+            url:"../drug/updateCount",
+            data:{"count":count,"id":value},
+            success:function (data) {
+                alert(data.msg)
+                location.reload()
+            }
+
+        })
+
+    }
+
+    /*删除药品信息*/
+    function deleteInfo(value) {
+
+        var r=confirm("您确定要删除?")
+        if (r==true)
+        {
+
+            $.ajax({
+
+                type:"post",
+                url:"../drug/deleteByName",
+                data:"name="+value,
+                success:function (data) {
+                    if (data.msg =="删除成功") {
+                        location.reload()
+                    }else {
+                        alert(data.msg)
+                    }
+                }
+
+            })
+
+        }
+
+    }
+
+    /*显示修改信息栏*/
+    function updateInfo(value) {
+        $("#showAll").attr("style","display:none;");//隐藏
+        $("#insert").attr("style","display:none;");//隐藏
+        $("#outTime").attr("style","display:none;");
+        $("#selInfo").attr("style","display:none;");//显示
+        $("#update").attr("style","display:block;");//显示
+
+        var DrugName = $("#DrugName1").val(value)
+
+
+    }
+
+    /*修改药品信息*/
+    function update() {
+
+        var DrugName = $("#DrugName1").val()
+        var Type = $("#Type1").val()
+        var MainFunction = $("#MainFunction1").val()
+        var Count = $("#Count1").val()
+        var NowCount = $("#NowCount1").val()
+        var MadeTime = $("#MadeTime1").val()
+        var TotalTime = $("#TotalTime1").val()
+        var JoinMoney = $("#JoinMoney1").val()
+        var SaleMoney = $("#SaleMoney1").val()
+        var Note = $("#Note1").val()
+
+        var info = {"drugName":DrugName,"type":Type,"mainFunction":MainFunction,"count":Count,"nowCount":NowCount,
+            "madeTime":MadeTime,"totalTime":TotalTime,"joinMoney":JoinMoney,"saleMoney":SaleMoney,"note":Note,
+        }
+        console.log(info)
+        $.ajax({
+            type:"post",
+            url:"../drug/updateByName",
+            data:JSON.stringify(info),
+            contentType: 'application/json;charset=UTF-8',
+            dataType:"json",
+            success: function(data){
+                if (data.msg =="修改成功") {
+
+                    location.reload()
+                }else {
+                    alert(data.msg)
+
+                }
+
+            }
+        });
+    }
+
+    /*添加药品信息*/
+    function insertInfo() {
+
+        var DrugName = $("#DrugName").val()
+        var Type = $("#Type").val()
+        var MainFunction = $("#MainFunction").val()
+        var Count = $("#Count").val()
+        var NowCount = $("#NowCount").val()
+        var MadeTime = $("#MadeTime").val()
+        var TotalTime = $("#TotalTime").val()
+        var JoinMoney = $("#JoinMoney").val()
+        var SaleMoney = $("#SaleMoney").val()
+        var Note = $("#Note").val()
+
+        var info = {"drugName":DrugName,"type":Type,"mainFunction":MainFunction,"count":Count,"nowCount":NowCount,
+                    "madeTime":MadeTime,"totalTime":TotalTime,"joinMoney":JoinMoney,"saleMoney":SaleMoney,"note":Note,
+                    }
+
+        $.ajax({
+            type:"post",
+            url:"../drug/insertInfo",
+            data:JSON.stringify(info),
+            contentType: 'application/json;charset=UTF-8',
+            dataType:"json",
+            success: function(data){
+                location.reload()
+                alert(data.msg)
+
+            }
+        });
+    }
+
+</script>
+<body>
+<div class="wrapper">
+    <!--头部信息-->
+    <div class="main-header">
+
+        <nav class="navbar navbar-header navbar-expand-lg">
+            <div class="container-fluid">
+
+                <div id="addname"></div>  <a href="../role/logout" methods="post">退出登录</a>
+
+            </div>
+        </nav>
+    </div>
+    <!--左侧信息栏-->
+    <div class="sidebar">
+        <div class="scrollbar-inner sidebar-wrapper">
+
+            <ul class="nav">
+                <li class="nav-item " id="adminInfo">
+                    <a href="roleIndex.html">
+                        <i class="la la-user">
+                        </i>
+                        <p>管理员信息</p>
+                    </a>
+                </li>
+                <li class="nav-item ">
+                    <a href="notice.html">
+                        <i class="la la-envelope"></i>
+                        <p>药店公告管理</p>
+                    </a>
+                </li>
+                <li class="nav-item active">
+                    <a href="drugInfo.html">
+                        <i class="la la-list-ol"></i>
+                        <p>药品信息管理</p>
+                    </a>
+                </li>
+                <li class="nav-item ">
+                    <a href="record.html">
+                        <i class="la la-server"></i>
+                        <p>进出药品管理</p>
+                    </a>
+                </li>
+                <li class="nav-item ">
+                    <a href="_buy.html">
+                        <i class="la la-cart-arrow-down"></i>
+                        <p>线下销售管理</p>
+                    </a>
+                </li>
+
+            </ul>
+        </div>
+    </div>
+    <!--中间主体内容-->
+    <div class="main-panel">
+        <div class="content">
+            <div class="container-fluid">
+                <div class="card-body ">
+                    <button onclick="showAll()">所有药品信息</button>&nbsp;&nbsp;
+                    <button onclick="timeOut()">即将过期药品信息</button>&nbsp;&nbsp;
+                    <button onclick="addInfo()">添加药品信息</button>&nbsp;&nbsp;
+                    <input type="text"  placeholder="搜索" id="info">
+                    <button   onclick="selInfo()">搜索</button>
+                </div>
+                <!--查看全部信息-->
+                <div class="row" id="showAll">
+                    <table class="table table-bordered table-head-bg-info table-bordered-bd-info mt-4">
+                        <thead>
+                        <tr>
+                            <th scope="col">药品名称</th>
+                            <th scope="col">药品类型</th>
+                            <th scope="col">药品主治功能</th>
+                            <th scope="col">药品入库数量</th>
+                            <th scope="col">药品现有库存</th>
+                            <th scope="col">药品生产日期</th>
+                            <th scope="col">药品保质期</th>
+                            <th scope="col">药品进价</th>
+                            <th scope="col">药品售价</th>
+                            <th scope="col">药品销量</th>
+                            <th scope="col">备注信息</th>
+                            <th scope="col">选择操作</th>
+
+                        </tr>
+                        </thead>
+                        <tbody id="tab">
+
+                        </tbody>
+                    </table>
+                </div>
+                <!--查看快过期或已过期信息-->
+                <div class="row" id="outTime">
+                    <table class="table table-bordered table-head-bg-info table-bordered-bd-info mt-4">
+                        <thead>
+                        <tr>
+                            <th scope="col">药品名称</th>
+                            <th scope="col">药品类型</th>
+                            <th scope="col">药品主治功能</th>
+                            <th scope="col">药品入库数量</th>
+                            <th scope="col">药品现有库存</th>
+                            <th scope="col">药品生产日期</th>
+                            <th scope="col">药品保质期</th>
+                            <th scope="col">药品进价</th>
+                            <th scope="col">药品售价</th>
+                            <th scope="col">药品销量</th>
+                            <th scope="col">备注信息</th>
+                            <th scope="col">选择操作</th>
+
+                        </tr>
+                        </thead>
+                        <tbody id="tabOuttime">
+
+                        </tbody>
+                    </table>
+                </div>
+                <!--显示搜索信息-->
+                <div class="row" id="selInfo">
+                    <table class="table table-bordered table-head-bg-info table-bordered-bd-info mt-4">
+                        <thead>
+                        <tr>
+                            <th scope="col">药品名称</th>
+                            <th scope="col">药品类型</th>
+                            <th scope="col">药品主治功能</th>
+                            <th scope="col">药品入库数量</th>
+                            <th scope="col">药品现有库存</th>
+                            <th scope="col">药品生产日期</th>
+                            <th scope="col">药品保质期</th>
+                            <th scope="col">药品进价</th>
+                            <th scope="col">药品售价</th>
+                            <th scope="col">药品销量</th>
+                            <th scope="col">备注信息</th>
+                            <th scope="col">选择操作</th>
+
+                        </tr>
+                        </thead>
+                        <tbody id="selTab">
+
+                        </tbody>
+                    </table>
+                </div>
+                <!--添加药品信息-->
+                <div class="row" id="insert">
+                    <div class="col-md-12">
+                        <div class="card">
+
+                            <div class="card-body">
+                                <div class="form">
+                                    <h3>添加药品信息</h3>
+                                    <div class="form-group from-show-notify row">
+                                        <input type="text" class="form-control input-fixed" id="DrugName" placeholder="药品名称">
+                                    </div>
+                                    <div class="form-group from-show-notify row">
+                                        <input type="text" class="form-control input-fixed" id="Type" placeholder="药品分类">
+                                    </div>
+                                    <div class="form-group from-show-notify row">
+                                        <input type="text" class="form-control input-fixed" id="MainFunction" placeholder="主治功能">
+                                    </div>
+                                    <div class="form-group from-show-notify row">
+                                        <input type="text" class="form-control input-fixed" id="Count" placeholder="药品入库数量">
+                                    </div>
+                                    <div class="form-group from-show-notify row">
+                                        <input type="text" class="form-control input-fixed" id="NowCount" placeholder="药品现有数量">
+                                    </div>
+                                    <div class="form-group from-show-notify row">
+                                        <input type="text" class="form-control input-fixed" id="MadeTime" placeholder="药品生产日期 格式'2020-3-9'">
+                                    </div>
+                                    <div class="form-group from-show-notify row">
+                                        <input type="text" class="form-control input-fixed" id="TotalTime" placeholder="药品保质期">
+                                    </div>
+                                    <div class="form-group from-show-notify row">
+                                        <input type="text" class="form-control input-fixed" id="JoinMoney" placeholder="药品进价">
+                                    </div>
+                                    <div class="form-group from-show-notify row">
+                                        <input type="text" class="form-control input-fixed" id="SaleMoney" placeholder="药品售价">
+                                    </div>
+                                    <div class="form-group from-show-notify row">
+                                        <input type="text" class="form-control input-fixed" id="Note" placeholder="备注信息">
+                                    </div>
+
+
+
+
+                                    <div class="form-group from-show-notify row">
+                                        <div class="col-lg-5 col-md-9 col-sm-12 text-right">
+                                            <button class="btn btn-success" onclick="insertInfo()">提交信息</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <!--修改药品信息-->
+                <div class="row" id="update">
+                    <div class="col-md-12">
+                        <div class="card">
+
+                            <div class="card-body">
+                                <div class="form">
+                                    <h3>修改药品信息</h3>
+                                    <div class="form-group from-show-notify row">
+                                        <input type="text" class="form-control input-fixed" id="DrugName1" placeholder="药品名称" >
+                                    </div>
+                                    <div class="form-group from-show-notify row">
+                                        <input type="text" class="form-control input-fixed" id="Type1" placeholder="药品分类">
+                                    </div>
+                                    <div class="form-group from-show-notify row">
+                                        <input type="text" class="form-control input-fixed" id="MainFunction1" placeholder="主治功能">
+                                    </div>
+                                    <div class="form-group from-show-notify row">
+                                        <input type="text" class="form-control input-fixed" id="Count1" placeholder="药品入库数量">
+                                    </div>
+                                    <div class="form-group from-show-notify row">
+                                        <input type="text" class="form-control input-fixed" id="NowCount1" placeholder="药品现有数量">
+                                    </div>
+                                    <div class="form-group from-show-notify row">
+                                        <input type="text" class="form-control input-fixed" id="MadeTime1" placeholder="药品生产日期 格式'2020-3-9'" >
+                                    </div>
+                                    <div class="form-group from-show-notify row">
+                                        <input type="text" class="form-control input-fixed" id="TotalTime1" placeholder="药品保质期">
+                                    </div>
+                                    <div class="form-group from-show-notify row">
+                                        <input type="text" class="form-control input-fixed" id="JoinMoney1" placeholder="药品进价">
+                                    </div>
+                                    <div class="form-group from-show-notify row">
+                                        <input type="text" class="form-control input-fixed" id="SaleMoney1" placeholder="药品售价">
+                                    </div>
+                                    <div class="form-group from-show-notify row">
+                                        <input type="text" class="form-control input-fixed" id="Note1" placeholder="备注信息">
+                                    </div>
+
+
+
+
+                                    <div class="form-group from-show-notify row">
+                                        <div class="col-lg-5 col-md-9 col-sm-12 text-right">
+                                            <button class="btn btn-success" onclick="update()">提交信息</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+</div>
+</body>
+
+</html>

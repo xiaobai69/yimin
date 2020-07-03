@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html >
+<head>
+<meta charset="UTF-8">
+<title>益民药房登录注册</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <script src="../js/index.js"></script>
+  <script type="text/javascript" src="../js/jquery.min.js"></script>
+
+
+</head>
+
+<script type="text/javascript">
+  function login() {
+
+      var name = $("#name").val();
+      var password = $("#password").val();
+      var info = {"name":name,"password":password}
+      console.log(info)
+      $.ajax({
+          type:"post",
+          url:"../user/login",
+          data:JSON.stringify(info),
+          contentType: 'application/json;charset=UTF-8',
+          dataType:"json",
+          success: function(data){
+              if(data.msg == "登录成功"){
+
+                  location.href="index.html"
+
+              }else{
+                  alert(data.msg)
+
+              }
+          }
+      });
+  }
+
+  function register() {
+      var name = $("#names").val();
+      var password = $("#passwords").val();
+      var sex = $("#sex").val();
+      var phone = $("#phone").val();
+      var address = $("#address").val();
+      var info = {"name":name,"password":password,"sex":sex,"phone":phone,"address":address}
+      $.ajax({
+          type:"post",
+          url:"../user/register",
+          data:JSON.stringify(info),
+          contentType: 'application/json;charset=UTF-8',
+          dataType:"json",
+          success: function(data){
+              if(data.msg =="信息添加成功，请登录"){
+                  alert(data.msg)
+                  cambiar_login()
+
+              }else{
+
+                  alert(data.msg)
+              }
+          }
+      })
+  }
+</script>
+
+<body>
+
+<link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
+<link rel='stylesheet prefetch' href='https://fonts.googleapis.com/icon?family=Material+Icons'>
+
+
+<div class="cotn_principal">
+  <div class="cont_centrar">
+    <div class="cont_login">
+      <div class="cont_info_log_sign_up">
+        <div class="col_md_login">
+          <div class="cont_ba_opcitiy">
+            <h2>登录</h2>
+            <p>请输入输入账号密码登录</p>
+            <button class="btn_login" onClick="cambiar_login()">登录</button>
+          </div>
+        </div>
+        <div class="col_md_sign_up">
+          <div class="cont_ba_opcitiy">
+            <h2>注册</h2>
+            <p>请输入信息进行注册</p>
+            <button class="btn_sign_up" onClick="cambiar_sign_up()">注册</button>
+          </div>
+        </div>
+      </div>
+      <div class="cont_back_info">
+        <div class="cont_img_back_grey"> <img src="../images/login.jpg" alt="" /> </div>
+      </div>
+      <div class="cont_forms" >
+        <div class="cont_img_back_"> <img src="../img/login.jpg" alt="" /> </div>
+        <div class="cont_form_login"> <a href="#" onClick="ocultar_login_sign_up()" ><i class="material-icons">&#xE5C4;</i></a>
+          <h2>登录</h2>
+          <input type="text" placeholder="账号" id="name"/>
+          <input type="password" placeholder="密码" id="password"/>
+          <button class="btn_login" onClick="login()">登录</button>
+        </div>
+        <div class="cont_form_sign_up"> <a href="#" onClick="ocultar_login_sign_up()"><i class="material-icons">&#xE5C4;</i></a>
+          <h2>注册</h2>
+          <input type="text" placeholder="账号" id="names"/>
+          <input type="password" placeholder="密码" id="passwords"/>
+          <input type="text" placeholder="性别" id="sex"/>
+          <input type="text" placeholder="电话" id="phone"/>
+          <input type="text" placeholder="地址" id="address"/>
+
+          <button class="btn_sign_up" onClick="register()">注册</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+</body>
+
+</html>

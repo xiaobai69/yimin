@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+
+<head>
+    <meta charset="UTF-8">
+    <title>测试</title>
+</head>
+<body>
+
+<a href="../role/logout" methods="post">退出登录</a>
+<shiro:hasRole name="admin"><a href="login.html">admin</a></shiro:hasRole><br>
+<shiro:hasRole name="staff"><a href="login.html">staff</a></shiro:hasRole><br>
+
+</body>
+</html>

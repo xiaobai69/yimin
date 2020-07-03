@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>益民大药房</title>
+	<link href="../css/bootstrap.css" type="text/css" rel="stylesheet" media="all">
+	<link href="../css/styles.css" type="text/css" rel="stylesheet" media="all">
+	<script type="text/javascript" src="../js/jquery.min.js"></script>
+</head>
+
+
+<script type="text/javascript">
+
+    <!--获取登录信息,显示所有药品信息-->
+    window.onload=function(){
+
+        $.ajax({
+            type:"post",
+            url:"../drug/getUser",
+            // data:JSON.stringify(info),
+            // contentType: 'application/json;charset=UTF-8',
+            // dataType:"json",
+            success: function(data){
+                if(data == ""){
+                    $("#username").append("<a href='login.html' style='color:mintcream'>"+"当前未登录，请跳转登录"+"</a>"+"")
+
+                } else {
+                    $("#username").append("当前用户:"+data.name+"    <a href='../user/outLog' methods='post' style='color:mintcream'>"+"退出登录"+"</a>"+"")
+
+                }
+
+
+
+            }
+        });
+
+        $.ajax({
+            type:"post",
+            url:"../drug/getByNumber",
+            success: function(data){
+
+                for(var i=0;i<data.length;i++){
+
+                    $("#addInfo").append("<div class=\"col-sm-6 col-md-4 services-grids\">" +
+                        "<div class=\"thumbnail\">" +
+                        "<div class=\"caption services-caption\" id='addInfo1'>" +
+                        "<a href='#'><h4 id="+data[i].id+"drugName"+"></h4></a>" +
+                        "<p id="+data[i].id+"type"+"></p>" +
+                        "<p id="+data[i].id+"mainFunction"+"></p>" +
+                        "<p id="+data[i].id+"saleMoney"+"></p>" +
+                        "<button value="+data[i].id+" onclick='buyInfo(value)'>添加购买</button>" +
+                        "</div></div></div>")
+
+
+                    $("#"+data[i].id+"drugName"+"").html('药品名称: '+data[i].drugName+'');
+                    $("#"+data[i].id+"type"+"").html('药品类型: '+data[i].type+'');
+                    $("#"+data[i].id+"mainFunction"+"").html('主治功能：'+data[i].mainFunction+'');
+                    $("#"+data[i].id+"saleMoney"+"").html('售价：￥'+data[i].saleMoney+'');
+                }
+
+
+            }
+        });
+
+    }
+
+    <!--热销药品	-->
+    function rexiao() {
+        $.ajax({
+            type:"post",
+            url:"../drug/getByNumber",
+            success: function(data){
+                $("#addInfo").empty();
+                for(var i=0;i<data.length;i++){
+                    $("#addInfo").append("<div class=\"col-sm-6 col-md-4 services-grids\">" +
+                        "<div class=\"thumbnail\">" +
+                        "<div class=\"caption services-caption\" id='addInfo1'>" +
+                        "<a href='#'><h4 id="+data[i].id+"drugName"+"></h4></a>" +
+                        "<p id="+data[i].id+"type"+"></p>" +
+                        "<p id="+data[i].id+"mainFunction"+"></p>" +
+                        "<p id="+data[i].id+"saleMoney"+"></p>" +
+                        "<button value="+data[i].id+" onclick='buyInfo(value)'>添加购买</button>" +
+                        "</div></div></div>")
+                    $("#"+data[i].id+"drugName"+"").html('药品名称: '+data[i].drugName+'');
+                    $("#"+data[i].id+"type"+"").html('药品类型: '+data[i].type+'');
+                    $("#"+data[i].id+"mainFunction"+"").html('主治功能：'+data[i].mainFunction+'');
+                    $("#"+data[i].id+"saleMoney"+"").html('售价：￥'+data[i].saleMoney+'');
+                }
+            }
+        });
+    }
+
+    <!--药店推荐	-->
+    function rnote() {
+        $.ajax({
+            type:"post",
+            url:"../drug/getByNote",
+            success: function(data){
+                $("#addInfo").empty();
+                for(var i=0;i<data.length;i++){
+                    $("#addInfo").append("<div class=\"col-sm-6 col-md-4 services-grids\">" +
+                        "<div class=\"thumbnail\">" +
+                        "<div class=\"caption services-caption\" id='addInfo1'>" +
+                        "<a href='#'><h4 id="+data[i].id+"drugName"+"></h4></a>" +
+                        "<p id="+data[i].id+"type"+"></p>" +
+                        "<p id="+data[i].id+"mainFunction"+"></p>" +
+                        "<p id="+data[i].id+"saleMoney"+"></p>" +
+                        "<button value="+data[i].id+" onclick='buyInfo(value)'>添加购买</button>" +
+                        "</div></div></div>")
+
+
+                    $("#"+data[i].id+"drugName"+"").html('药品名称: '+data[i].drugName+'');
+                    $("#"+data[i].id+"type"+"").html('药品类型: '+data[i].type+'');
+                    $("#"+data[i].id+"mainFunction"+"").html('主治功能：'+data[i].mainFunction+'');
+                    $("#"+data[i].id+"saleMoney"+"").html('售价：￥'+data[i].saleMoney+'');
+                }
+
+
+            }
+        });
+    }
+
+    <!--药品类型查询	-->
+    function rtype(value) {
+        $("#addInfo").empty();
+
+        $.ajax({
+            type:"post",
+            url:"../drug/getByType",
+            data:"type="+value,
+            // contentType: 'application/json;charset=UTF-8',
+            // dataType:"json",
+            success: function(data){
+
+                for(var i=0;i<data.length;i++){
+
+                    $("#addInfo").append("<div class=\"col-sm-6 col-md-4 services-grids\">" +
+                        "<div class=\"thumbnail\">" +
+                        "<div class=\"caption services-caption\" id='addInfo1'>" +
+                        "<a href='#' onclick='buyInfo()'><h4 id="+data[i].id+"drugName"+"></h4></a>" +
+                        "<p id="+data[i].id+"type"+"></p><p id="+data[i].id+"mainFunction"+"></p>" +
+                        "<p id="+data[i].id+"saleMoney"+"></p>" +
+                        "<button value="+data[i].id+" onclick='buyInfo(value)'>添加购买</button>" +
+                        "</div></div></div>")
+
+                    $("#"+data[i].id+"drugName"+"").html('药品名称: '+data[i].drugName+'');
+                    $("#"+data[i].id+"type"+"").html('药品类型: '+data[i].type+'');
+                    $("#"+data[i].id+"mainFunction"+"").html('主治功能：'+data[i].mainFunction+'');
+                    $("#"+data[i].id+"saleMoney"+"").html('售价：￥'+data[i].saleMoney+'');
+                }
+            }
+
+        });
+
+
+    }
+
+    <!--添加药品到购物车，判断是否登录	-->
+    function buyInfo(value) {
+        // 获取到药品id
+
+        $.ajax({
+            type:"post",
+            url:"../drug/getUser",
+            success: function(data){
+                if(data == ""){
+                    alert("当前未登录，请登录...")
+                    window.open(url="../html/login.html","_self")
+                } else {
+                    var info ={"did":value,"uid":data.id,"number":1}
+                    $.ajax({
+                        type:"post",
+                        url:"../buy/insertInfo",
+                        data:JSON.stringify(info),
+                        contentType: 'application/json;charset=UTF-8',
+                        dataType:"json",
+                        success: function(data){
+                            alert(data.msg)
+                        }
+                    });
+
+                }
+
+
+
+            }
+        });
+    }
+
+</script>
+
+
+<body>
+<!--标题头-->
+<div class="header">
+	<div class="container">
+		<div class="header-logo">
+			<div class="header-info">
+				<h4>益民大药房</h4>
+			</div>
+
+
+		</div>
+		<div class="header-info">
+			<div id="username"></div>
+
+		</div>
+		<div class="clearfix"> </div>
+	</div>
+</div>
+
+<!--搜索栏-->
+<div class="header-bottom">
+	<div class="container">
+		<!--top-nav-->
+		<div class="top-nav cl-effect-5">
+			<span class="menu-icon"><img src="../images/menu-icon.png" alt=""/></span>
+			<ul class="nav1">
+				<li><a href="index.html" ><span data-hover="药店简介">药店简介</span></a></li>
+				<li><a href="about.html" > <span data-hover="药品信息查询">药品信息查询</span></a></li>
+				<li><a href="services.html" class="active"> <span data-hover="热销、分类、推送">热销、分类、推送</span></a></li>
+				<li><a href="buy.html"> <span data-hover="购物车">购物车</span></a></li>
+				<li><a href="news.html"> <span data-hover="药店信息公告">药店信息公告</span></a></li>
+			</ul>
+
+		</div>
+
+		<div class="clearfix"> </div>
+	</div>
+</div>
+
+<!--药品信息-->
+<div class="services">
+	<div class="container">
+		<div class="grid_3 grid_5">
+			<h1 class="t-button">
+				<button class="label label-danger" onclick="rexiao()">热销药品</button>
+				<button class="label label-info" onclick="rtype(value)" value="感冒">感冒</button>
+				<button class="label label-default" onclick="rtype(value)" value="养生">养生</button>
+				<button class="label label-primary" onclick="rtype(value)" value="减肥">减肥</button>
+				<button class="label label-warning" onclick="rtype(value)" value="消化">消化</button>
+				<button class="label label-success" onclick="rnote()">店长推荐</button>
+			</h1>
+		</div>
+		<div class="row services-info" id="addInfo">
+			<!--<div class="col-sm-6 col-md-4 services-grids">-->
+			<!--<div class="thumbnail">-->
+
+			<!--<div class="caption services-caption">-->
+			<!--<h2><a href="single.html">Facilisis dignissimos luptat</a></h2>-->
+			<!--<p>Cras justo odioda pibus facilisis dignissimos voluptatem accusantium</p>-->
+			<!--</div>-->
+			<!--</div>-->
+			<!--</div>-->
+
+			<div class="clearfix"> </div>
+		</div>
+
+	</div>
+</div>
+
+
+<!--底部药店说明-->
+<div class="footer-bottom">
+	<div class="container">
+		<p> 益民大药房网上药店版权所有，并保留所有权利  <a href="index.html">http://localhost:8080/html/index.html</a></p>
+	</div>
+</div>
+
+<!--返回顶部-->
+<a href="#" id="toTop" style="display: block;"> <span id="toTopHover" style="opacity: 1;"> </span></a>
+
+</body>
+</html>

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>益民大药房</title>
+	<link href="../css/bootstrap.css" type="text/css" rel="stylesheet" media="all">
+	<link href="../css/styles.css" type="text/css" rel="stylesheet" media="all">
+	<link rel="stylesheet" href="../assets/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../assets/css/ready.css">
+	<link rel="stylesheet" href="../assets/css/my.css">
+	<link rel="stylesheet" href="../assets/css/demo.css">
+	<script type="text/javascript" src="../js/jquery.min.js"></script>
+</head>
+
+
+<script type="text/javascript">
+
+    <!--获取购物车信息-->
+    window.onload=function(){
+
+        $.ajax({
+            type:"post",
+            url:"../drug/getUser",
+            success: function(data){
+                if(data == ""){
+                    $("#username").append("<a href='login.html' style='color:mintcream'>"+"当前未登录，请跳转登录"+"</a>"+"")
+
+                } else {
+                    $("#username").append("当前用户:"+data.name+"    <a href='../user/outLog' methods='post' style='color:mintcream'>"+"退出登录"+"</a>"+"")
+
+
+                }
+            }
+        });
+
+        var str = " "
+        $.ajax({
+
+            type:"post",
+            url:"../buy/selAll",
+            success: function(data){
+                for(var i=0;i<data.length;i++){
+					var sum =(data[i].number)*(data[i].salemoney)
+                    str="<tr>" +
+                        "<td>"+data[i].drugname+"</td>"+
+                        "<td>" +data[i].salemoney+"</td>" +
+                        "<td>" +data[i].number+"</td>"+
+                        "<td>" +sum+"</td>"+
+                        "<td><button onclick='buy(value)' value="+data[i].drugname+">确认购买</button>&nbsp;&nbsp;"+
+                        "&nbsp;&nbsp;<button onclick='deleteInfo(value)' value="+data[i].drugname+">删除药品</button></td>"+
+                        "</tr>";
+
+                    $("#tab").append(str);
+                }
+            }
+        });
+    }
+
+    <!--删除购物车信息-->
+	function deleteInfo(value){
+		console.log(value)
+        var r=confirm("您确定要删除?")
+        if (r==true) {
+            $.ajax({
+                type: "post",
+                url: "../buy/deleteInfo",
+                data: "drugName=" + value,
+                success: function (data) {
+                    if (data.msg == "删除成功") {
+                        location.reload()
+
+                    } else {
+                        alert(data.msg)
+
+                    }
+                }
+            });
+        }
+    }
+
+    /*确定购买药品*/
+    function buy(value) {
+        console.log(value)
+        $.ajax({
+            type:"post",
+            url:"../buy/buy",
+            data:"drugName="+value,
+            success: function(data){
+                if(data.msg == "购买成功"){
+                    alert("购买成功，等待药店发货")
+                    location.reload()
+
+                } else {
+                    alert(data.msg)
+
+                }
+            }
+        });
+    }
+
+</script>
+
+
+<body>
+<!--标题头-->
+<div class="header">
+	<div class="container">
+		<div class="header-logo">
+			<div class="header-info">
+				<h4>益民大药房</h4>
+			</div>
+
+
+		</div>
+		<div class="header-info">
+			<div id="username"></div>
+
+		</div>
+		<div class="clearfix"> </div>
+	</div>
+</div>
+
+<!--搜索栏-->
+<div class="header-bottom">
+	<div class="container">
+		<!--top-nav-->
+		<div class="top-nav cl-effect-5">
+			<span class="menu-icon"><img src="../images/menu-icon.png" alt=""/></span>
+			<ul class="nav1">
+				<li><a href="index.html" ><span data-hover="药店简介">药店简介</span></a></li>
+				<li><a href="about.html" > <span data-hover="药品信息查询">药品信息查询</span></a></li>
+				<li><a href="services.html" > <span data-hover="热销、分类、推送">热销、分类、推送</span></a></li>
+				<li><a href="buy.html" class="active"> <span data-hover="购物车">购物车</span></a></li>
+				<li><a href="news.html" > <span data-hover="药店信息公告">药店信息公告</span></a></li>
+			</ul>
+
+		</div>
+
+		<div class="clearfix"> </div>
+	</div>
+</div>
+
+<!--药店信息公告-->
+<div class="contact">
+	<div class="container">
+		<h3>购物车信息</h3>
+
+		<table class="table table-bordered table-head-bg-info table-bordered-bd-info mt-4">
+			<thead>
+			<tr>
+				<th scope="col">药品名称</th>
+				<th scope="col">药品价格</th>
+				<th scope="col">药品数量</th>
+				<th scope="col">总价</th>
+				<th scope="col">操作选择</th>
+
+			</tr>
+			</thead>
+			<tbody id="tab">
+
+			</tbody>
+		</table>
+
+
+	</div>
+</div>
+
+
+<!--底部药店说明-->
+<div class="footer-bottom">
+	<div class="container">
+		<p> 益民大药房网上药店版权所有，并保留所有权利  <a href="index.html">http://localhost:8080/html/index.html</a></p>
+	</div>
+</div>
+
+<!--返回顶部-->
+<a href="#" id="toTop" style="display: block;"> <span id="toTopHover" style="opacity: 1;"> </span></a>
+
+</body>
+</html>
